@@ -329,7 +329,7 @@ static cell_t PrintToChat(IPluginContext *pContext, const cell_t *params)
 
 	g_SourceMod.SetGlobalTarget(client);
 
-	char buffer[254];
+	char buffer[248]; // 248 to prevent the engine error from sending 255-byte messages
 
 	{
 		DetectExceptions eh(pContext);
@@ -337,7 +337,7 @@ static cell_t PrintToChat(IPluginContext *pContext, const cell_t *params)
 		if (eh.HasException())
 			return 0;
 
-		if (actualLength >= 255)
+		if (actualLength >= 249)
 			return pContext->ThrowNativeError("'%s' Exceeded the maximum lenght allowed for the engine", buffer);
 	}
 	
@@ -649,4 +649,5 @@ REGISTER_NATIVES(halflifeNatives)
 	{"GetClientsInRange",		GetClientsInRange},
 	{NULL,						NULL},
 };
+
 
