@@ -32,7 +32,6 @@
 #include "common_logic.h"
 #include <IHandleSys.h>
 #include "GameConfigs.h"
-#include "PseudoAddrManager.h"
 
 HandleType_t g_GameConfigsType;
 
@@ -156,10 +155,11 @@ static cell_t smn_GameConfGetAddress(IPluginContext *pCtx, const cell_t *params)
 	if (!gc->GetAddress(key, &val))
 		return 0;
 
-	if (pCtx->GetRuntime()->FindPubvarByName("__Virtual_Address__", nullptr) == SP_ERROR_NONE) {
-		return pseudoAddr.ToPseudoAddress(val);
-	}
-	return reinterpret_cast<uintptr_t>(val);
+#ifdef KE_ARCH_X86
+	return (cell_t)val;
+#else
+	return pseudoAddr.ToPseudoAddress(val);
+#endif
 }
 
 static cell_t smn_GameConfGetMemSig(IPluginContext *pCtx, const cell_t *params)
@@ -187,10 +187,11 @@ static cell_t smn_GameConfGetMemSig(IPluginContext *pCtx, const cell_t *params)
 		return 0;
 	}
 
-	if (pCtx->GetRuntime()->FindPubvarByName("__Virtual_Address__", nullptr) == SP_ERROR_NONE) {
-		return pseudoAddr.ToPseudoAddress(val);
-	}
-	return reinterpret_cast<uintptr_t>(val);
+#ifdef KE_ARCH_X86
+	return (cell_t)val;
+#else
+	return pseudoAddr.ToPseudoAddress(val);
+#endif
 }
 
 static GameConfigsNatives s_GameConfigsNatives;

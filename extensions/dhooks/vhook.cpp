@@ -465,18 +465,19 @@ HookReturnStruct *GetReturnStruct(DHooksCallback *dg)
 	return res;
 }
 
-cell_t GetThisPtr(IPluginContext* pContext, void *iface, ThisPointerType type)
+cell_t GetThisPtr(void *iface, ThisPointerType type)
 {
-	if (type == ThisPointer_CBaseEntity)
+	if(type == ThisPointer_CBaseEntity)
 	{
 		if (!iface)
 			return -1;
 		return gamehelpers->EntityToBCompatRef((CBaseEntity *)iface);
 	}
-	if (pContext->GetRuntime()->FindPubvarByName("__Virtual_Address__", nullptr) == SP_ERROR_NONE) {
-		return g_pSM->ToPseudoAddress(iface);
-	}
+#ifdef KE_ARCH_X64
+	return g_pSM->ToPseudoAddress(iface);
+#else
 	return (cell_t)iface;
+#endif
 }
 
 #if defined( WIN32 ) && !defined( KE_ARCH_X64 )
@@ -499,7 +500,7 @@ void *Callback(DHooksCallback *dg, void **argStack)
 
 	if(dg->thisType == ThisPointer_CBaseEntity || dg->thisType == ThisPointer_Address)
 	{
-		dg->plugin_callback->PushCell(GetThisPtr(dg->plugin_callback->GetParentContext(), g_SHPtr->GetIfacePtr(), dg->thisType));
+		dg->plugin_callback->PushCell(GetThisPtr(g_SHPtr->GetIfacePtr(), dg->thisType));
 	}
 	if(dg->returnType != ReturnType_Void)
 	{
@@ -683,7 +684,7 @@ float Callback_float(DHooksCallback *dg, void **argStack)
 
 	if(dg->thisType == ThisPointer_CBaseEntity || dg->thisType == ThisPointer_Address)
 	{
-		dg->plugin_callback->PushCell(GetThisPtr(dg->plugin_callback->GetParentContext(), g_SHPtr->GetIfacePtr(), dg->thisType));
+		dg->plugin_callback->PushCell(GetThisPtr(g_SHPtr->GetIfacePtr(), dg->thisType));
 	}
 
 	returnStruct = GetReturnStruct(dg);
@@ -840,7 +841,7 @@ SDKVector *Callback_vector(DHooksCallback *dg, void **argStack)
 
 	if(dg->thisType == ThisPointer_CBaseEntity || dg->thisType == ThisPointer_Address)
 	{
-		dg->plugin_callback->PushCell(GetThisPtr(dg->plugin_callback->GetParentContext(), g_SHPtr->GetIfacePtr(), dg->thisType));
+		dg->plugin_callback->PushCell(GetThisPtr(g_SHPtr->GetIfacePtr(), dg->thisType));
 	}
 
 	returnStruct = GetReturnStruct(dg);
@@ -994,7 +995,7 @@ string_t *Callback_stringt(DHooksCallback *dg, void **argStack)
 
 	if(dg->thisType == ThisPointer_CBaseEntity || dg->thisType == ThisPointer_Address)
 	{
-		dg->plugin_callback->PushCell(GetThisPtr(dg->plugin_callback->GetParentContext(), g_SHPtr->GetIfacePtr(), dg->thisType));
+		dg->plugin_callback->PushCell(GetThisPtr(g_SHPtr->GetIfacePtr(), dg->thisType));
 	}
 
 	returnStruct = GetReturnStruct(dg);

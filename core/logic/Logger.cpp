@@ -29,7 +29,6 @@
  * Version: $Id$
  */
 
-#include <string_view>
 #include <time.h>
 #include <cstdarg>
 #include "Logger.h"
@@ -80,19 +79,6 @@ ConfigResult Logger::OnSourceModConfigChanged(const char *key,
 		} else {
 			ke::SafeStrcpy(error, maxlength, "Invalid value: must be [daily|map|game]");
 			return ConfigResult_Reject;
-		}
-
-		return ConfigResult_Accept;
-	} else if (strcasecmp(key, "LogTimeFormat") == 0) {
-		if (strcasecmp(value, "default") == 0)
-		{
-			m_isUsingDefaultTimeFormat = true;
-			m_UserTimeFormat.clear();
-		}
-		else {
-			// value is the time format string
-			m_isUsingDefaultTimeFormat = false;
-			m_UserTimeFormat.assign(value);
 		}
 
 		return ConfigResult_Accept;
@@ -166,7 +152,11 @@ void Logger::LogToOpenFileEx(FILE *fp, const char *msg, va_list ap)
 	char buffer[3072];
 	ke::SafeVsprintf(buffer, sizeof(buffer), msg, ap);
 
-	const char* date = GetFormattedDate();
+	char date[32];
+	time_t t = g_pSM->GetAdjustedTime();
+	tm *curtime = localtime(&t);
+	strftime(date, sizeof(date), "%m/%d/%Y - %H:%M:%S", curtime);
+
 	fprintf(fp, "L %s: %s\n", date, buffer);
 
 	if (!sv_logecho || bridge->GetCvarBool(sv_logecho))
@@ -184,7 +174,10 @@ void Logger::LogToFileOnlyEx(FILE *fp, const char *msg, va_list ap)
 	char buffer[3072];
 	ke::SafeVsprintf(buffer, sizeof(buffer), msg, ap);
 
-	const char* date = GetFormattedDate();
+	char date[32];
+	time_t t = g_pSM->GetAdjustedTime();
+	tm *curtime = localtime(&t);
+	strftime(date, sizeof(date), "%m/%d/%Y - %H:%M:%S", curtime);
 	fprintf(fp, "L %s: %s\n", date, buffer);
 
 	fflush(fp);
@@ -385,7 +378,11 @@ FILE *Logger::_OpenNormal()
 
 	if (!m_DamagedNormalFile)
 	{
-		const char* date = GetFormattedDate();
+		time_t t = g_pSM->GetAdjustedTime();
+		tm *curtime = localtime(&t);
+		char date[32];
+
+		strftime(date, sizeof(date), "%m/%d/%Y - %H:%M:%S", curtime);
 		fprintf(pFile, "L %s: SourceMod log file session started (file \"%s\") (Version \"%s\")\n", date, m_NormalFileName.c_str(), SOURCEMOD_VERSION);
 		m_DamagedNormalFile = true;
 	}
@@ -406,7 +403,11 @@ FILE *Logger::_OpenError()
 
 	if (!m_DamagedErrorFile)
 	{
-		const char* date = GetFormattedDate();
+		time_t t = g_pSM->GetAdjustedTime();
+		tm *curtime = localtime(&t);
+
+		char date[32];
+		strftime(date, sizeof(date), "%m/%d/%Y - %H:%M:%S", curtime);
 		fprintf(pFile, "L %s: SourceMod error session started\n", date);
 		fprintf(pFile, "L %s: Info (map \"%s\") (file \"%s\")\n", date, m_CurrentMapName.c_str(), m_ErrorFileName.c_str());
 		m_DamagedErrorFile = true;
@@ -451,25 +452,3 @@ void Logger::_CloseError()
 void Logger::_CloseFatal()
 {
 }
-
-const char* Logger::GetFormattedDate() const
-{
-	static char date[256];
-	constexpr std::string_view DEFAULT_TIME_FORMAT{ "%m/%d/%Y - %H:%M:%S" };
-
-	time_t t = g_pSM->GetAdjustedTime();
-	tm *curtime = localtime(&t);
-
-	if (m_isUsingDefaultTimeFormat)
-	{
-		strftime(date, sizeof(date), DEFAULT_TIME_FORMAT.data(), curtime);
-	}
-	else
-	{
-		strftime(date, sizeof(date), m_UserTimeFormat.c_str(), curtime);
-	}
-
-	return date;
-
-}
-

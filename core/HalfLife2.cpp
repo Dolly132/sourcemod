@@ -1102,7 +1102,7 @@ int CHalfLife2::ReferenceToIndex(cell_t entRef)
 
 		CEntInfo *pInfo = LookupEntity(hndl.GetEntryIndex());
 
-		if (!pInfo || pInfo->m_SerialNumber != hndl.GetSerialNumber())
+		if (pInfo->m_SerialNumber != hndl.GetSerialNumber())
 		{
 			return INVALID_EHANDLE_INDEX;
 		}
@@ -1600,26 +1600,3 @@ uint64_t CHalfLife2::GetServerSteamId64() const
 
 	return 1ULL;
 }
-
-void CHalfLife2::RemoveDataTableCache(datamap_t *pMap)
-{
-	if (pMap == nullptr)
-	{
-		m_Maps.clear();
-		return;
-	}
-
-	m_Maps.removeIfExists(pMap);
-}
-
-bool CHalfLife2::RemoveSendPropCache(const char *classname)
-{
-	if (classname == nullptr)
-	{
-		m_Classes.clear();
-		return true;
-	}
-
-	return m_Classes.remove(classname);
-}
-

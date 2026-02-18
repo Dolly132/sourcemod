@@ -31,106 +31,106 @@
 			/* CBasePlayer::GiveNamedItem(char const*, int) */
 			"GiveNamedItem"
 			{
-				"linux"		"436"
-				"windows"	"435"
+				"linux"		"404"
+				"windows"	"403"
 			}
 
 			/* CBaseCombatCharacter::RemovePlayerItem(CBaseCombatWeapon*) */
 			"RemovePlayerItem"
 			{
-				"linux"		"298"
-				"windows"	"297"
+				"linux"		"274"
+				"windows"	"273"
 			}
 
 			/* CBaseCombatCharacter::Weapon_GetSlot(int) const */
 			"Weapon_GetSlot"
 			{
-				"linux"		"296"
-				"windows"	"295"
+				"linux"		"272"
+				"windows"	"271"
 			}
 
 			/* CBaseAnimating::Ignite(float, bool, float, bool) */
 			"Ignite"
 			{
-				"linux"		"231"
-				"windows"	"230"
+				"linux"		"213"
+				"windows"	"212"
 			}
 
 			/* CBaseAnimating::Extinguish() */
 			"Extinguish"
 			{
-				"linux"		"235"
-				"windows"	"234"
+				"linux"		"217"
+				"windows"	"216"
 			}
 
 			/* CBaseEntity::Teleport(Vector const*, QAngle const*, Vector const*) */
 			"Teleport"
 			{
-				"linux"		"122"
-				"windows"	"121"
+				"linux"		"110"
+				"windows"	"109"
 			}
 
 			/* CBasePlayer::CommitSuicide(bool, bool) */
 			"CommitSuicide"
 			{
-				"linux"		"479"
-				"windows"	"479"
+				"linux"		"444"
+				"windows"	"444"
 			}
 
 			/* CBaseEntity::GetVelocity(Vector*, Vector*) */
 			"GetVelocity"
 			{
-				"linux"		"156"
-				"windows"	"155"
+				"linux"		"142"
+				"windows"	"141"
 			}
 
 			/* CBaseEntity::EyeAngles() */
 			"EyeAngles"
 			{
-				"linux"		"147"
-				"windows"	"146"
+				"linux"		"133"
+				"windows"	"132"
 			}
 
 			/* CBaseEntity::SetModel(char const*) */
 			"SetEntityModel"
 			{
-				"linux"		"28"
-				"windows"	"27"
+				"linux"		"26"
+				"windows"	"25"
 			}
 
 			/* CBaseEntity::AcceptInput(char const*, CBaseEntity*, CBaseEntity*, variant_t, int) */
 			"AcceptInput"
 			{
-				"linux"		"41"
-				"windows"	"40"
+				"linux"		"38"
+				"windows"	"37"
 			}
 
 			/* CBaseCombatCharacter::Weapon_Equip(CBaseCombatWeapon*) */
 			"WeaponEquip"
 			{
-				"linux"		"287"
-				"windows"	"286"
+				"linux"		"265"
+				"windows"	"264"
 			}
 
 			/* CBaseEntity::Activate() */
 			"Activate"
 			{
-				"linux"		"38"
-				"windows"	"37"
+				"linux"		"35"
+				"windows"	"34"
 			}
 
 			/* CBasePlayer::PlayerRunCommand(CUserCmd*, IMoveHelper*) */
 			"PlayerRunCmd"
 			{
-				"linux"		"456"
-				"windows"	"455"
+				"linux"		"422"
+				"windows"	"421"
 			}
 
 			/* CBaseCombatCharacter::GiveAmmo(int, int, bool) */
 			"GiveAmmo"
 			{
-				"linux"		"277"
-				"windows"	"276"
+				"linux"		"256"
+				"windows"	"255"
 			}
 		}
 
@@ -145,8 +145,8 @@
 			"FireOutput"
 			{
 				"library"	"server"
-				"windows"	"\x55\x8B\xEC\x81\xEC\x40\x01\x00\x00\x8B\xC1"
-				"linux"		"@_ZN17CBaseEntityOutput10FireOutputE9variant_tP11CBaseEntityS2_f"
+				"windows"	"@?FireOutput@COutputEvent@@QAEXPAVCBaseEntity@@0M@Z"
+				"linux"		"@_ZN12COutputEvent10FireOutputEP11CBaseEntityS1_f"
 			}
 		}
 	}

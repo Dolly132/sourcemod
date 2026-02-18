@@ -329,18 +329,15 @@ static cell_t PrintToChat(IPluginContext *pContext, const cell_t *params)
 
 	g_SourceMod.SetGlobalTarget(client);
 
-	char buffer[248]; // 248 to prevent the engine error from sending 255-byte messages
+	char buffer[254];
 
 	{
 		DetectExceptions eh(pContext);
-		size_t actualLength = g_SourceMod.FormatString(buffer, sizeof(buffer), pContext, params, 2);
+		g_SourceMod.FormatString(buffer, sizeof(buffer), pContext, params, 2);
 		if (eh.HasException())
 			return 0;
-
-		if (actualLength >= 249)
-			return pContext->ThrowNativeError("'%s' Exceeded the maximum lenght allowed for the engine", buffer);
 	}
-	
+
 	if (!g_HL2.TextMsg(client, HUD_PRINTTALK, buffer))
 	{
 		return pContext->ThrowNativeError("Could not send a usermessage");
@@ -649,5 +646,3 @@ REGISTER_NATIVES(halflifeNatives)
 	{"GetClientsInRange",		GetClientsInRange},
 	{NULL,						NULL},
 };
-
-

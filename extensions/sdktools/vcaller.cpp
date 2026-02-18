@@ -63,8 +63,7 @@ inline void DecodePassMethod(ValveType vtype, SDKPassMethod method, PassType &ty
 		type = PassType_Basic;
 		if (vtype == Valve_POD
 			|| vtype == Valve_Float
-			|| vtype == Valve_Bool
-			|| vtype == Valve_VirtualAddress)
+			|| vtype == Valve_Bool)
 		{
 			flags = PASSFLAG_BYVAL | PASSFLAG_ASPOINTER;
 		} else {
@@ -87,13 +86,6 @@ inline void DecodePassMethod(ValveType vtype, SDKPassMethod method, PassType &ty
 
 static cell_t StartPrepSDKCall(IPluginContext *pContext, const cell_t *params)
 {
-	auto call_type = (ValveCallType)params[1];
-	if (call_type == ValveCall_Raw && pContext->GetRuntime()->FindPubvarByName("__Virtual_Address__", nullptr) == SP_ERROR_NONE) {
-		return pContext->ThrowNativeError("SDKCall_Raw is unavailable for plugins that have enabled virtual address.");
-	}
-	if (call_type == ValveCall_VirtualAddress && pContext->GetRuntime()->FindPubvarByName("__Virtual_Address__", nullptr) != SP_ERROR_NONE) {
-		return pContext->ThrowNativeError("SDKCall_VirtualAddress is unavailable for plugins that haven't enabled virtual address.");
-	}
 	s_numparams = 0;
 	s_vtbl_index = -1;
 	s_call_addr = NULL;
@@ -180,10 +172,11 @@ static cell_t PrepSDKCall_SetSignature(IPluginContext *pContext, const cell_t *p
 
 static cell_t PrepSDKCall_SetAddress(IPluginContext *pContext, const cell_t *params)
 {
-	s_call_addr = reinterpret_cast<void*>(params[1]);
-	if (pContext->GetRuntime()->FindPubvarByName("__Virtual_Address__", nullptr) == SP_ERROR_NONE) {
-		s_call_addr = g_pSM->FromPseudoAddress(params[1]);
-	}
+#ifdef KE_ARCH_X86
+	s_call_addr = reinterpret_cast<void *>(params[1]);
+#else
+	s_call_addr = g_pSM->FromPseudoAddress(params[1]);
+#endif
 
 	return (s_call_addr != NULL) ? 1 : 0;
 }
@@ -413,37 +406,7 @@ static cell_t SDKCall(IPluginContext *pContext, const cell_t *params)
 				else if (reinterpret_cast<uintptr_t>(thisptr) < VALID_MINIMUM_MEMORY_ADDRESS)
 				{
 					vc->stk_put(ptr);
-					return pContext->ThrowNativeError("Invalid ThisPtr address %p is pointing to reserved memory.", thisptr);
-				}
-
-				*(void **)ptr = thisptr;
-				startparam++;
-			}
-			break;
-		case ValveCall_VirtualAddress:
-			{
-				//params[startparam] is an address to a pointer to THIS
-				//params following this are params to the method we will invoke later
-				if (startparam > numparams)
-				{
-					vc->stk_put(ptr);
-					return pContext->ThrowNativeError("Expected a ThisPtr address, it wasn't found");
-				}
-
-				//note: varargs pawn args are passed by-ref
-				cell_t *cell;
-				pContext->LocalToPhysAddr(params[startparam], &cell);
-				void* thisptr = reinterpret_cast<void*>(g_pSM->FromPseudoAddress(*cell));
-
-				if (thisptr == nullptr)
-				{
-					vc->stk_put(ptr);
-					return pContext->ThrowNativeError("ThisPtr address cannot be null");
-				}
-				else if (reinterpret_cast<uintptr_t>(thisptr) < VALID_MINIMUM_MEMORY_ADDRESS)
-				{
-					vc->stk_put(ptr);
-					return pContext->ThrowNativeError("Invalid ThisPtr address %p is pointing to reserved memory.", thisptr);
+					return pContext->ThrowNativeError("Invalid ThisPtr address 0x%x is pointing to reserved memory.", thisptr);
 				}
 
 				*(void **)ptr = thisptr;
@@ -573,13 +536,6 @@ static cell_t SDKCall(IPluginContext *pContext, const cell_t *params)
 				addr = *(bool **)addr;
 			}
 			return *addr ? 1 : 0;
-        } else if (vc->retinfo->vtype == Valve_VirtualAddress) {
-            void *addr = *(void **)vc->retbuf;
-            if (vc->retinfo->flags & PASSFLAG_ASPOINTER)
-			{
-				addr = *(void **)addr;
-			}
-			return g_pSM->ToPseudoAddress(addr);
 		} else {
 			cell_t *addr = (cell_t *)vc->retbuf;
 			if (vc->retinfo->flags & PASSFLAG_ASPOINTER)

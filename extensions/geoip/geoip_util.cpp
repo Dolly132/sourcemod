@@ -183,10 +183,6 @@ const char *getLang(int target)
 
 		if (translator->GetLanguageInfo(langid, &code, NULL))
 		{
-			if (strcmp(code, "chi") == 0)
-			{
-				code = "zh-CN";
-			}
 			for (size_t i = 0; i < mmdb.metadata.languages.count; i++)
 			{
 				if (strcmp(code, mmdb.metadata.languages.names[i]) == 0)

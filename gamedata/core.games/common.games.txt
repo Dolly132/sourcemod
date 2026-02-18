@@ -196,8 +196,6 @@
 			"game"					"tf2classic"
 			"game"					"pf2"
 			"game"					"dystopia"
-			"game"					"treason"
-			"game"					"tf2classified"
 		}
 
 		"Keys"
@@ -254,8 +252,6 @@
 			"game"					"tf2classic"
 			"game"					"pf2"
 			"game"					"dystopia"
-			"game"					"treason"
-			"game"					"tf2classified"
 		}
 		
 		"Keys"
@@ -321,8 +317,6 @@
 			"game"					"tf2classic"
 			"game"					"pf2"
 			"game"					"dystopia"
-			"game"					"treason"
-			"game"					"tf2classified"
 		}
 		
 		"Keys"
@@ -376,7 +370,6 @@
 			"engine"	"blade"
 			"engine"	"insurgency"
 			"engine"	"mcv"
-			"engine"	"doi"
 		}
 		
 		"Keys"
@@ -405,7 +398,6 @@
 		"Keys"
 		{
 			"RadioMenuClosesOnInvalidSlot"	"yes"
-			"SkipNetchanIClient" 			"no"
 		}
 	}
 

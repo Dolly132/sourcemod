@@ -376,7 +376,7 @@ ReturnAction_t HandleDetour(HookType_t hookType, CHook* pDetour)
 		{
 			// The this pointer is implicitly always the first argument.
 			void *thisPtr = pDetour->GetArgument<void *>(0);
-			cell_t thisAddr = GetThisPtr(pCallback->GetParentContext(), thisPtr, pWrapper->thisType);
+			cell_t thisAddr = GetThisPtr(thisPtr, pWrapper->thisType);
 			pCallback->PushCell(thisAddr);
 		}
 
@@ -532,7 +532,6 @@ CDynamicHooksSourcePawn::CDynamicHooksSourcePawn(HookSetup *setup, CHook *pDetou
 	this->hookType = setup->hookType;
 	this->m_pDetour = pDetour;
 	this->callConv = setup->callConv;
-	this->thisFuncCallConv = setup->callConv;
 }
 
 HookReturnStruct *CDynamicHooksSourcePawn::GetReturnStruct()
