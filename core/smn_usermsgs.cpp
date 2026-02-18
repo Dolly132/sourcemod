@@ -568,7 +568,7 @@ static cell_t smn_EndMessage(IPluginContext *pCtx, const cell_t *params)
 			if (msg->GetString("msg_name", msg_name, sizeof(msg_name)))
 		#else
 			g_ReadBitBuf.StartReading(msg->GetBasePointer(), msg->GetNumBytesWritten());
-			if (g_ReadBufHandle.Seek(3) && g_ReadBufHandle.ReadString(msg_name, sizeof(msg_name)))
+			if (g_ReadBitBuf.Seek(3) && g_ReadBitBuf.ReadString(msg_name, sizeof(msg_name)))
 		#endif
 			{
 				if (strlen(msg_name) >= 248)
