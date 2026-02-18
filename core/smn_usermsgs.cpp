@@ -50,6 +50,7 @@ bf_read g_ReadBitBuf;
 
 int g_MsgPlayers[SM_MAXPLAYERS+1];
 bool g_IsMsgInExec = false;
+bool g_CheckForMsgLength = false;
 
 typedef List<MsgListenerWrapper *> MsgWrapperList;
 typedef List<MsgListenerWrapper *>::iterator MsgWrapperIter;
@@ -448,6 +449,10 @@ static cell_t smn_StartMessage(IPluginContext *pCtx, const cell_t *params)
 		}
 	}
 
+	// SayText2
+	if (msgid == 4)
+		g_CheckForMsgLength = true;
+
 #ifdef USE_PROTOBUF_USERMESSAGES
 	protobuf::Message *msg = g_UserMsgs.StartProtobufMessage(msgid, cl_array, numClients, params[4]);
 	if (!msg)
@@ -538,6 +543,42 @@ static cell_t smn_EndMessage(IPluginContext *pCtx, const cell_t *params)
 		return pCtx->ThrowNativeError("Unable to end message, no message is in progress");
 	}
 
+	bool failure = false;
+
+	if (g_CheckForMsgLength)
+	{
+		HandleError herr;
+		HandleType_t type;
+
+		sec.pOwner = NULL;
+		sec.pIdentity = g_pCoreIdent;
+	#ifdef USE_PROTOBUF_USERMESSAGES
+		SMProtobufMessage *msg;
+		type = g_ProtobufType;
+	#else
+		bf_write *msg;
+		type = g_WrBitBufType;
+	#endif
+
+		if ((herr=handlesys->ReadHandle(g_CurMsgHandle, type, &sec, (void **)&msg)) == HandleError_None)
+		{
+			char msg_name[256];
+
+		#ifdef USE_PROTOBUF_USERMESSAGES
+			if (msg->GetString("msg_name", msg_name, sizeof(msg_name)))
+		#else
+			g_ReadBitBuf.StartReading(msg->GetBasePointer(), msg->GetNumBytesWritten());
+			if (g_ReadBufHandle.Seek(3) && g_ReadBufHandle.ReadString(msg_name, sizeof(msg_name)))
+		#endif
+			{
+				if (strlen(msg_name) >= 248)
+					failure = true;
+			}
+		}
+
+		g_CheckForMsgLength = false;
+	}
+
 	g_UserMsgs.EndMessage();
 
 	sec.pOwner = pCtx->GetIdentity();
@@ -545,6 +586,9 @@ static cell_t smn_EndMessage(IPluginContext *pCtx, const cell_t *params)
 	handlesys->FreeHandle(g_CurMsgHandle, &sec);
 
 	g_IsMsgInExec = false;
+
+	if (failure)
+		return pCtx->ThrowNativeError("This message exceeded SayText2's maximum bytes allowed");
 
 	return 1;
 }
