@@ -29,7 +29,7 @@
  * Version: $Id$
  */
 
-#include "common_logic.h"
+#include "logic/common_logic.h"
 #include "PlayerManager.h"
 #include "smn_usermsgs.h"
 #include "logic_bridge.h"
