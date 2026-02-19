@@ -596,7 +596,7 @@ static cell_t smn_EndMessage(IPluginContext *pCtx, const cell_t *params)
 					continue;
 
 				char msg[128];
-				std::snprintf(msg, sizeof(msg), "Message length is: %d", strlen(msg_name));
+				std::snprintf(msg, sizeof(msg), "Message length is: %d", (int)strlen(msg_name));
 				pPlayer->PrintToConsole(msg);
 			}
 		}
