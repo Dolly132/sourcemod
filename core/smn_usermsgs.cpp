@@ -29,6 +29,7 @@
  * Version: $Id$
  */
 
+#include "common_logic.h"
 #include "PlayerManager.h"
 #include "smn_usermsgs.h"
 #include "logic_bridge.h"
@@ -36,6 +37,8 @@
 # include "UserMessagePBHelpers.h"
 #endif
 #include <bridge/include/IScriptManager.h>
+#include <bridge/include/CoreProvider.h>
+#include <bridge/include/IVEngineServerBridge.h>
 
 HandleType_t g_ProtobufType = NO_HANDLE_TYPE;
 HandleType_t g_WrBitBufType = NO_HANDLE_TYPE;
