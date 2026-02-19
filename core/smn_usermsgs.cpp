@@ -450,7 +450,7 @@ static cell_t smn_StartMessage(IPluginContext *pCtx, const cell_t *params)
 	}
 
 	// SayText2
-	pCtx->ThrowNativeError("UserMessage ID: %d", msgid);
+	pCtx->ReportError("UserMessage ID: %d", msgid);
 	if (msgid == 4)
 		g_CheckForMsgLength = true;
 
@@ -548,7 +548,7 @@ static cell_t smn_EndMessage(IPluginContext *pCtx, const cell_t *params)
 
 	if (g_CheckForMsgLength)
 	{
-		pCtx->ThrowNativeError("Checking for message length");
+		pCtx->ReportError("Checking for message length");
 		HandleError herr;
 		HandleType_t type;
 
@@ -577,7 +577,7 @@ static cell_t smn_EndMessage(IPluginContext *pCtx, const cell_t *params)
 					failure = true;
 			}
 
-			pCtx->ThrowNativeError("Message Length is: %d", strlen(msg_name));
+			pCtx->ReportError("Message Length is: %d", strlen(msg_name));
 		}
 
 		g_CheckForMsgLength = false;
