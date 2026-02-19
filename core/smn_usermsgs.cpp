@@ -447,10 +447,13 @@ static cell_t smn_StartMessage(IPluginContext *pCtx, const cell_t *params)
 		} else if (!pPlayer->IsConnected()) {
 			return pCtx->ThrowNativeError("Client %d is not connected", client);
 		}
+
+		char msg[64];
+		std::snprintf(msg, sizeof(msg), "UserMessage ID: %d", msgid);
+		pPlayer->PrintToConsole(msg);
 	}
 
 	// SayText2
-	pCtx->ReportError("UserMessage ID: %d", msgid);
 	if (msgid == 4)
 		g_CheckForMsgLength = true;
 
@@ -548,7 +551,15 @@ static cell_t smn_EndMessage(IPluginContext *pCtx, const cell_t *params)
 
 	if (g_CheckForMsgLength)
 	{
-		pCtx->ReportError("Checking for message length");
+		for (unsigned int i = 0; i <= 31; i++)
+		{
+			CPlayer *pPlayer = g_Players.GetPlayerByIndex(i);
+
+			if (!pPlayer || !pPlayer->IsConnected())
+				continue;
+
+			pPlayer->PrintToConsole("Checking for message length");
+		}
 		HandleError herr;
 		HandleType_t type;
 
@@ -577,7 +588,17 @@ static cell_t smn_EndMessage(IPluginContext *pCtx, const cell_t *params)
 					failure = true;
 			}
 
-			pCtx->ReportError("Message Length is: %d", strlen(msg_name));
+			for (unsigned int i = 0; i <= 31; i++)
+			{
+				CPlayer *pPlayer = g_Players.GetPlayerByIndex(i);
+
+				if (!pPlayer || !pPlayer->IsConnected())
+					continue;
+
+				char msg[128];
+				std::snprintf(msg, sizeof(msg), "Message length is: %d", strlen(msg_name));
+				pPlayer->PrintToConsole(msg);
+			}
 		}
 
 		g_CheckForMsgLength = false;
