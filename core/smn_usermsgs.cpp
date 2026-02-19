@@ -449,7 +449,7 @@ static cell_t smn_StartMessage(IPluginContext *pCtx, const cell_t *params)
 		}
 
 		char msg[64];
-		std::snprintf(msg, sizeof(msg), "UserMessage ID: %d", msgid);
+		std::snprintf(msg, sizeof(msg), "UserMessage ID: %d\n", msgid);
 		pPlayer->PrintToConsole(msg);
 	}
 
@@ -558,7 +558,7 @@ static cell_t smn_EndMessage(IPluginContext *pCtx, const cell_t *params)
 			if (!pPlayer || !pPlayer->IsConnected())
 				continue;
 
-			pPlayer->PrintToConsole("Checking for message length");
+			pPlayer->PrintToConsole("Checking for message length\n");
 		}
 		HandleError herr;
 		HandleType_t type;
@@ -596,9 +596,12 @@ static cell_t smn_EndMessage(IPluginContext *pCtx, const cell_t *params)
 					continue;
 
 				char msg[128];
-				std::snprintf(msg, sizeof(msg), "Message length is: %d", (int)strlen(msg_name));
+				std::snprintf(msg, sizeof(msg), "Message length is: %d\n", (int)strlen(msg_name));
 				pPlayer->PrintToConsole(msg);
 			}
+
+			char buf[20];
+			std::snprintf(buf, sizeof(buf), "Failure is: %d", (int)failure);
 		}
 
 		g_CheckForMsgLength = false;
