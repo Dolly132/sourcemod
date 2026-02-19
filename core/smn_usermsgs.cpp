@@ -578,14 +578,13 @@ static cell_t smn_EndMessage(IPluginContext *pCtx, const cell_t *params)
 			char msg_name[256];
 
 		#ifdef USE_PROTOBUF_USERMESSAGES
-			if (msg->GetString("msg_name", msg_name, sizeof(msg_name)))
+			if (msg->GetString("msg_name", msg_name, sizeof(msg_name)) && strlen(msg_name) >= 248)
 		#else
 			g_ReadBitBuf.StartReading(msg->GetBasePointer(), msg->GetNumBytesWritten());
-			if (g_ReadBitBuf.Seek(3) && g_ReadBitBuf.ReadString(msg_name, sizeof(msg_name)))
+			if (g_ReadBitBuf.m_nDataBytes >= 255)
 		#endif
 			{
-				if (strlen(msg_name) >= 248)
-					failure = true;
+				failure = true;
 			}
 
 			for (unsigned int i = 0; i <= 31; i++)
