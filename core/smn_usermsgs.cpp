@@ -579,9 +579,9 @@ static cell_t smn_EndMessage(IPluginContext *pCtx, const cell_t *params)
 				if (strlen(msg_name) >= 248)
 					failure = true;
 			}
-		}
 
-		bridge->ConsolePrint("Message Length is: %d", strlen(msg_name));
+			bridge->ConsolePrint("Message Length is: %d", strlen(msg_name));
+		}
 
 		g_CheckForMsgLength = false;
 	}
