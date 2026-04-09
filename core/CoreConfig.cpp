@@ -318,7 +318,7 @@ inline bool IsPathSepChar(char c)
 #endif
 }
 
-void SM_ParseConfig(FILE *fp, ke::HashMap<std::string, std::string, ke::StringHashPolicy> &cvars_list)
+void SM_ParseConfig(FILE *fp, ke::HashMap<std::string, std::string, ke::StringPolicy> &cvars_list)
 {
 	char line[4096];
 	char cvar_name[256];
