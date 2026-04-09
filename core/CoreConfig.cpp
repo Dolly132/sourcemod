@@ -445,7 +445,7 @@ bool SM_ExecuteConfig(IPlugin *pl, AutoConfig *cfg, bool can_create)
 	float x;
 
 	List<std::string> existing_cvars;
-	bool needs_update = false;
+	bool needs_regeneration = false;
 
 	if (!will_create)
 	{
@@ -546,12 +546,44 @@ cfg_read:
 
 	SM_ParseConfig(fp, existing_cvars);
 
+	// #1. Check if the plugin's cvar list has a cvar that doesn't exist in the config file
+	for (iter = convars->begin(); iter != convars->end(); iter++)
+	{
+		const ConVar *cvar = (*iter);
+#if SOURCE_ENGINE >= SE_ORANGEBOX
+			if (cvar->IsFlagSet(FCVAR_DONTRECORD))
+#else
+			if (cvar->IsBitSet(FCVAR_DONTRECORD))
+#endif
+		{
+			continue;
+		}
+
+		const char *cvar_name = cvar->GetName();
+		bool found = false;
+		for (List<std::string>::iterator it = existing_cvars.begin(); it != existing_cvars.end(); it++)
+		{
+			if (strcmp(cvar_name, it->c_str()) == 0)
+			{
+				found = true;
+				break;
+			}
+		}
+
+		if (!found)
+		{
+			needs_regeneration = true;
+			break;
+		}
+	}
+
+	// #2. Check if the config file has a cvar that doesn't exist in the plugin's cvar list
 	for (List<std::string>::iterator it = existing_cvars.begin(); it != existing_cvars.end(); it++)
 	{
 		// Check if the existing cvar in the config file is in the plugin's cvar list.
 		// If not, then let sourcemod remove the existing config file and generate a new one
 		bool found = false;
-		for (List<const ConVar *>::iterator iter = convars->begin(); iter != convars->end(); iter++)
+		for (iter = convars->begin(); iter != convars->end(); iter++)
 		{
 			const ConVar *cvar = (*iter);
 #if SOURCE_ENGINE >= SE_ORANGEBOX
@@ -572,14 +604,14 @@ cfg_read:
 
 		if (!found)
 		{
-			needs_update = true;
+			needs_regeneration = true;
 			break;
 		}
 	}
 
 	fclose(fp);
 
-	if (!needs_update)
+	if (!needs_regeneration)
 	{
 		// No new/missing cvars were found, let sourcemod execute the file
 		goto cfg_execute;
