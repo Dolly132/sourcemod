@@ -534,6 +534,8 @@ cfg_generate:
 	file_exists = true;
 	can_create = false;
 	fclose(fp);
+	fp = NULL;
+	goto cfg_execute;
 
 cfg_read:
 	if (!fp)
