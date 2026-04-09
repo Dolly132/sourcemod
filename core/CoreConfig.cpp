@@ -318,6 +318,50 @@ inline bool IsPathSepChar(char c)
 #endif
 }
 
+void SM_ParseConfig(FILE *fp, List<std::string> &cvars_list)
+{
+	char line[4096];
+	char cvar_name[256];
+
+	while (fgets(line, sizeof(line), fp))
+	{
+		char *ptr = line;
+
+		// Ignore whitespaces and tabs
+		while (*ptr == ' ' || *ptr == '\t')
+		{
+			ptr++;
+		}
+
+		// Ignore empty lines if found
+		if (*ptr == '\0' || *ptr == '\n' || *ptr == '\r')
+		{
+			continue;
+		}
+
+		// Ignore comments
+		if (*ptr == '/' && *(ptr + 1) == '/')
+		{
+			continue;
+		}
+
+		size_t i = 0;
+		while (*ptr != '\0' && *ptr != '\n' && *ptr != '\r' && *ptr != ' ' && *ptr != '\t' && i < (sizeof(cvar_name) - 1))
+		{
+			cvar_name[i++] = *ptr++;
+		}
+
+		cvar_name[i] = '\0';
+
+		if (!i)
+		{
+			continue;
+		}
+
+		cvars_list.push_back(cvar_name);
+	}
+}
+
 bool SM_ExecuteConfig(IPlugin *pl, AutoConfig *cfg, bool can_create)
 {
 	bool will_create = false;
@@ -394,18 +438,25 @@ bool SM_ExecuteConfig(IPlugin *pl, AutoConfig *cfg, bool can_create)
 	g_SourceMod.BuildPath(Path_Game, file, sizeof(file), "cfg/%s", local);
 
 	bool file_exists = ke::file::IsFile(file);
+	FILE *fp = NULL;
+	
+	List<const ConVar *> *convars = NULL;
+	List<const ConVar *>::iterator iter;
+	float x;
+
+	List<std::string> existing_cvars;
+	bool needs_update = false;
+
 	if (!will_create)
 	{
 		goto cfg_execute;
 	}
 
-	List<const ConVar *> *convars = NULL;
 	if (!pl->GetProperty("ConVarList", (void **)&convars, false) || !convars)
 	{
 		goto cfg_execute;
 	}
 
-	FILE *fp = NULL;
 	if (!file_exists)
 	{
 		/* Attempt to create it */
@@ -430,8 +481,6 @@ cfg_generate:
 	fprintf(fp, "// ConVars for plugin \"%s\"\n", pl->GetFilename());
 	fprintf(fp, "\n\n");
 
-	List<const ConVar *>::iterator iter;
-	float x;
 	for (iter = convars->begin(); iter != convars->end(); iter++)
 	{
 		const ConVar *cvar = (*iter);
@@ -493,10 +542,8 @@ cfg_read:
 		return can_create;
 	}
 
-	List<std::string> existing_cvars;
 	SM_ParseConfig(fp, existing_cvars);
 
-	bool needs_update = false;
 	for (List<std::string>::iterator it = existing_cvars.begin(); it != existing_cvars.end(); it++)
 	{
 		// Check if the existing cvar in the config file is in the plugin's cvar list.
@@ -538,7 +585,7 @@ cfg_read:
 	else
 	{
 		// New/missing cvars were found, let sourcemod recreate and generate the config file again
-		ke::file::Remove(file);
+		remove(file);
 		fp = fopen(file, "wt");
 		goto cfg_generate;
 	}
@@ -552,50 +599,6 @@ cfg_execute:
 	}
 
 	return can_create;
-}
-
-void SM_ParseConfig(FILE *fp, List<std::string> &cvars_list)
-{
-	char line[4096];
-	char cvar_name[256];
-
-	while (fgets(line, sizeof(line), fp))
-	{
-		char *ptr = line;
-
-		// Ignore whitespaces and tabs
-		while (*ptr == ' ' || *ptr == '\t')
-		{
-			ptr++;
-		}
-
-		// Ignore empty lines if found
-		if (*ptr == '\0' || *ptr == '\n' || *ptr == '\r')
-		{
-			continue;
-		}
-
-		// Ignore comments
-		if (*ptr == '/' && *(ptr + 1) == '/')
-		{
-			continue;
-		}
-
-		size_t i = 0;
-		while (*ptr != '\0' && *ptr != '\n' && *ptr != '\r' && *ptr != ' ' && *ptr != '\t' && i < (sizeof(cvar_name) - 1))
-		{
-			cvar_name[i++] = *ptr++;
-		}
-
-		cvar_name[i] = '\0';
-
-		if (!i)
-		{
-			continue;
-		}
-
-		cvars_list.push_back(cvar_name);
-	}
 }
 
 void SM_DoSingleExecFwds(IPluginContext *ctx)
