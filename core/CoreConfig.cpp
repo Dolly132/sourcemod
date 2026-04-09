@@ -318,7 +318,7 @@ inline bool IsPathSepChar(char c)
 #endif
 }
 
-void SM_ParseConfig(FILE *fp, ke::HashMap<std::string, std::string, ke::StringPolicy> &cvars_list)
+void SM_ParseConfig(FILE *fp, ke::HashMap<std::string, std::string, StringPolicy> &cvars_list)
 {
 	char line[4096];
 	char cvar_name[256];
@@ -392,7 +392,7 @@ void SM_ParseConfig(FILE *fp, ke::HashMap<std::string, std::string, ke::StringPo
 	}
 }
 
-bool SM_CvarExistsInConfig(ke::HashMap<std::string, std::string, ke::StringHashPolicy> &cvars, const char *cvar_name)
+bool SM_CvarExistsInConfig(ke::HashMap<std::string, std::string, StringPolicy> &cvars, const char *cvar_name)
 {
 	return cvars.find(cvar_name).found();
 }
@@ -502,7 +502,7 @@ bool SM_ExecuteConfig(IPlugin *pl, AutoConfig *cfg, bool can_create)
 	List<const ConVar *>::iterator iter;
 	float x;
 
-	ke::HashMap<std::string, std::string, ke::StringHashPolicy> existing_cvars;
+	ke::HashMap<std::string, std::string, StringPolicy> existing_cvars;
 	existing_cvars.init();
 	bool needs_regeneration = false;
 
