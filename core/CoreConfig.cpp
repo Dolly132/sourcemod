@@ -497,6 +497,7 @@ void SM_GenerateConfigFileAndExecute(
 	fprintf(fp, "// ConVars for plugin \"%s\"\n", pl->GetFilename());
 	fprintf(fp, "\n\n");
 
+	float x;
 	for (List<const ConVar *>::iterator iter = convars.begin(); iter != convars.end(); iter++)
 	{
 		const ConVar *cvar = (*iter);
@@ -686,7 +687,7 @@ bool SM_ExecuteConfig(IPlugin *pl, AutoConfig *cfg, bool can_create)
 		return can_create;
 	}
 
-	SM_GenerateConfigFileAndExecute(pl, file, *convars, true, existing_cvars);
+	SM_GenerateConfigFileAndExecute(pl, file, *convars, true, &existing_cvars);
 	can_create = false;
 	return can_create;
 }
