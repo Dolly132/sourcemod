@@ -479,7 +479,7 @@ inline void SM_ExecuteConfigFile(const char *file)
 	engine->ServerCommand(cmd);
 }
 
-void SM_GenerateConfigFileAndExecute(
+void SM_GenerateConfigFile(
 	IPlugin *pl,
 	const char *file,
 	List<const ConVar *> &convars,
@@ -561,14 +561,6 @@ void SM_GenerateConfigFileAndExecute(
 	fprintf(fp, "\n");
 
 	fclose(fp);
-
-	logger->LogMessage("File to execute is: %s", file);
-
-	// Remove "cfg/" from the file path because the `exec` command is strictly relative to the cfg folder
-	file += 4;
-
-	logger->LogMessage("File to execute after removing cfg/: %s", file);
-	SM_ExecuteConfigFile(file);
 }
 
 bool SM_ExecuteConfig(IPlugin *pl, AutoConfig *cfg, bool can_create)
@@ -664,7 +656,8 @@ bool SM_ExecuteConfig(IPlugin *pl, AutoConfig *cfg, bool can_create)
 	if (!file_exists)
 	{
 		/* If file doesn't exist, then automatically generate the config file and execute it */
-		SM_GenerateConfigFileAndExecute(pl, file, *convars);
+		SM_GenerateConfigFile(pl, file, *convars);
+		SM_ExecuteConfigFile(local);
 		can_create = false;
 		return can_create;
 	}
@@ -690,7 +683,8 @@ bool SM_ExecuteConfig(IPlugin *pl, AutoConfig *cfg, bool can_create)
 		return can_create;
 	}
 
-	SM_GenerateConfigFileAndExecute(pl, file, *convars, true, &existing_cvars);
+	SM_GenerateConfigFile(pl, file, *convars, true, &existing_cvars);
+	SM_ExecuteConfigFile(local);
 	can_create = false;
 	return can_create;
 }
