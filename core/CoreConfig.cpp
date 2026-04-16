@@ -562,9 +562,12 @@ void SM_GenerateConfigFileAndExecute(
 
 	fclose(fp);
 
+	logger->LogMessage("File to execute is: %s", file);
+
 	// Remove "cfg/" from the file path because the `exec` command is strictly relative to the cfg folder
 	file += 4;
 
+	logger->LogMessage("File to execute after removing cfg/: %s", file);
 	SM_ExecuteConfigFile(file);
 }
 
